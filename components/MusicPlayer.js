@@ -22,28 +22,41 @@ import TrackPlayer, {
   useProgress,
   useTrackPlayerEvents,
 } from 'react-native-track-player';
-
+import Icon from '../assets/ICONS/notification.png';
 const {width, height} = Dimensions.get('window');
 const setupPlayer = async () => {
   try {
     await TrackPlayer.setupPlayer();
     await TrackPlayer.updateOptions({
       stopWithApp: true,
+      backwardJumpInterval: 15,
+      forwardJumpInterval: 15,
+
+      icon: Icon,
       capabilities: [
         Capability.Play,
         Capability.Pause,
         Capability.SkipToNext,
         Capability.SkipToPrevious,
-        Capability.Stop,
         Capability.JumpForward,
         Capability.JumpBackward,
-        Capability.PlayFromSearch,
+        Capability.SeekTo,
       ],
       compactCapabilities: [
         Capability.Play,
         Capability.Pause,
         Capability.SkipToNext,
         Capability.SkipToPrevious,
+        Capability.JumpBackward,
+      ],
+      notificationCapabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.SkipToNext,
+        Capability.SkipToPrevious,
+        Capability.JumpForward,
+        Capability.JumpBackward,
+        Capability.SeekTo,
       ],
     });
     await TrackPlayer.add(songs);

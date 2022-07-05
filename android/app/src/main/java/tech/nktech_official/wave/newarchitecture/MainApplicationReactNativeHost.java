@@ -1,4 +1,4 @@
-package com.wave.newarchitecture;
+package tech.nktech_official.wave.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.wave.BuildConfig;
-import com.wave.newarchitecture.components.MainComponentsRegistry;
-import com.wave.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import tech.nktech_official.wave.BuildConfig;
+import tech.nktech_official.wave.newarchitecture.components.MainComponentsRegistry;
+import tech.nktech_official.wave.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

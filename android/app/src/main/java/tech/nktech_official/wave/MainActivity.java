@@ -1,4 +1,4 @@
-package com.wave;
+package tech.nktech_official.wave;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

@@ -1,4 +1,4 @@
-package com.wave.newarchitecture.components;
+package tech.nktech_official.wave.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

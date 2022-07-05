@@ -1,4 +1,4 @@
-package com.wave.newarchitecture.modules;
+package tech.nktech_official.wave.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

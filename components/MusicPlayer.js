@@ -24,62 +24,7 @@ import TrackPlayer, {
 } from 'react-native-track-player';
 import Icon from '../assets/ICONS/notification.png';
 const {width, height} = Dimensions.get('window');
-const setupPlayer = async () => {
-  try {
-    await TrackPlayer.setupPlayer();
-    await TrackPlayer.updateOptions({
-      stopWithApp: true,
-      backwardJumpInterval: 15,
-      forwardJumpInterval: 15,
 
-      icon: Icon,
-      capabilities: [
-        Capability.Play,
-        Capability.Pause,
-        Capability.SkipToNext,
-        Capability.SkipToPrevious,
-        Capability.JumpForward,
-        Capability.JumpBackward,
-        Capability.SeekTo,
-      ],
-      compactCapabilities: [
-        Capability.Play,
-        Capability.Pause,
-        Capability.SkipToNext,
-        Capability.SkipToPrevious,
-        Capability.JumpBackward,
-      ],
-      notificationCapabilities: [
-        Capability.Play,
-        Capability.Pause,
-        Capability.SkipToNext,
-        Capability.SkipToPrevious,
-        Capability.JumpForward,
-        Capability.JumpBackward,
-        Capability.SeekTo,
-      ],
-    });
-    await TrackPlayer.add(songs);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const togglePlayback = async playbackState => {
-  try {
-    const currentTrack = await TrackPlayer.getCurrentTrack();
-    if (currentTrack !== null) {
-      if (playbackState == State.Paused || playbackState === 1) {
-        await TrackPlayer.play();
-      } else {
-        await TrackPlayer.pause();
-      }
-    }
-  } catch {
-    await setupPlayer();
-    await togglePlayback();
-  }
-};
 const skipTo = async id => {
   await TrackPlayer.skip(id);
 };
@@ -90,9 +35,68 @@ export default function MusicPlayer() {
   const songSlider = useRef(null);
   const [repeatMode, setRepeatMode] = useState('off');
   const [songIndex, setSongIndex] = useState(0);
-  const [trackArtwork, setTrackArtwork] = useState();
-  const [trackTitle, setTrackTitle] = useState();
-  const [trackArtist, setTrackArtist] = useState();
+
+  const [play, setPlay] = useState(false);
+
+  const setupPlayer = async () => {
+    try {
+      await TrackPlayer.setupPlayer();
+      await TrackPlayer.updateOptions({
+        stopWithApp: true,
+        backwardJumpInterval: 15,
+        forwardJumpInterval: 15,
+
+        icon: Icon,
+        capabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
+          Capability.JumpForward,
+          Capability.JumpBackward,
+          Capability.SeekTo,
+        ],
+        compactCapabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
+          Capability.JumpBackward,
+        ],
+        notificationCapabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SkipToNext,
+          Capability.SkipToPrevious,
+          Capability.JumpForward,
+          Capability.JumpBackward,
+          Capability.SeekTo,
+        ],
+      });
+      await TrackPlayer.add(songs);
+      let ai = await TrackPlayer.getCurrentTrack();
+      setSongIndex(ai);
+    } catch (error) {
+      let ai = await TrackPlayer.getCurrentTrack();
+      setSongIndex(ai);
+      console.log(error);
+    }
+  };
+  const togglePlayback = async playbackState => {
+    try {
+      const currentTrack = await TrackPlayer.getCurrentTrack();
+      if (currentTrack !== null) {
+        if (playbackState == State.Paused || playbackState === 1) {
+          await TrackPlayer.play();
+        } else {
+          await TrackPlayer.pause();
+        }
+      }
+    } catch {
+      await setupPlayer();
+      await togglePlayback();
+    }
+  };
   useTrackPlayerEvents(
     [Event.PlaybackTrackChanged, Event.RemoteStop],
     async event => {
@@ -100,27 +104,35 @@ export default function MusicPlayer() {
         event.type === Event.PlaybackTrackChanged &&
         event.nextTrack !== null
       ) {
-        const track = await TrackPlayer.getTrack(event.nextTrack);
-        const {title, artwork, artist} = track;
-        setTrackArtist(artist);
-        setTrackTitle(title);
-        setTrackArtwork(artwork);
+        if (event.nextTrack !== undefined) {
+          songSlider.current.scrollToOffset({
+            offset: event.nextTrack * width,
+            animated: false,
+          });
+        } else if (event.nextTrack === undefined) {
+          await skipTo(songIndex);
+        }
       } else if (event.type === Event.RemoteStop) {
       }
     },
   );
-
   useEffect(() => {
     setupPlayer();
-    scrollX.addListener(({value}) => {
+  }, []);
+  useEffect(() => {
+    scrollX.addListener(async ({value}) => {
       const index = Math.round(value / width);
-      skipTo(index);
+      setPlay(true);
       setSongIndex(index);
+      await skipTo(index);
+      if (play === true) {
+        await TrackPlayer.play();
+      }
     });
     return () => {
       scrollX.removeAllListeners();
     };
-  }, []);
+  }, [play]);
   const repeatIcon = () => {
     if (repeatMode === 'off') {
       return 'repeat-off';
@@ -145,17 +157,21 @@ export default function MusicPlayer() {
       setRepeatMode('off');
     }
   };
-  const skipForward = () => {
+  const skipForward = async () => {
+    // await TrackPlayer.skipToNext();
+    // let index = await TrackPlayer.getCurrentTrack();
+    // setSongIndex(index);
     songSlider.current.scrollToOffset({
       offset: (songIndex + 1) * width,
     });
-    TrackPlayer.skipToNext();
   };
-  const skipBackward = () => {
+  const skipBackward = async () => {
+    // await TrackPlayer.skipToPrevious();
+    // let index = await TrackPlayer.getCurrentTrack();
+    // setSongIndex(index);
     songSlider.current.scrollToOffset({
       offset: (songIndex - 1) * width,
     });
-    TrackPlayer.skipToPrevious();
   };
 
   const renderSongs = ({index, item}) => {
@@ -167,7 +183,7 @@ export default function MusicPlayer() {
           alignItems: 'center',
         }}>
         <View style={styles.artworkWrapper}>
-          <Image source={trackArtwork} style={styles.artworkImage} />
+          <Image source={item.artwork} style={styles.artworkImage} />
         </View>
       </Animated.View>
     );
@@ -200,14 +216,18 @@ export default function MusicPlayer() {
           />
         </View>
         <View>
-          <Text style={styles.title}>{trackTitle}</Text>
-          <Text style={styles.artist}>{trackArtist}</Text>
+          <Text style={styles.title}>{songs[songIndex].title}</Text>
+          <Text style={styles.artist}>{songs[songIndex].artist}</Text>
         </View>
         <View style={styles.controlWrapper}>
           <Slider
             style={styles.progressContainer}
             value={progress.position}
-            maximumValue={progress.duration}
+            maximumValue={
+              progress.duration === 0
+                ? songs[songIndex].duration
+                : progress.duration
+            }
             thumbTintColor="#FFD369"
             minimumTrackTintColor="#FFD369"
             maximumTrackTintColor="#FFF"
@@ -217,12 +237,18 @@ export default function MusicPlayer() {
           />
           <View style={styles.progressLableContainer}>
             <Text style={styles.ProgressLableTxt}>
-              {new Date(progress.position * 1000).toISOString().substr(14, 5)}
+              {new Date(progress.position * 1000).toISOString().slice(14, 19)}
             </Text>
             <Text style={styles.ProgressLableTxt}>
-              {new Date((progress.duration - progress.position) * 1000)
-                .toISOString()
-                .substr(14, 5)}
+              {progress.duration === 0
+                ? new Date(
+                    (songs[songIndex].duration - progress.position) * 1000,
+                  )
+                    .toISOString()
+                    .slice(14, 19)
+                : new Date((progress.duration - progress.position) * 1000)
+                    .toISOString()
+                    .slice(14, 19)}
             </Text>
           </View>
           <View style={styles.musicControlWrapper}>

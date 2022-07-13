@@ -1,8 +1,13 @@
 import {View, StyleSheet, StatusBar} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import MusicPlayer from './components/MusicPlayer';
+import SplashScreen from 'react-native-splash-screen';
 
 export default function App() {
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#222831" />

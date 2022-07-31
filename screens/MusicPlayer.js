@@ -12,7 +12,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Slider from '@react-native-community/slider';
-import {songs} from '../model/data';
+import {songs} from '../model/songs';
 import TrackPlayer, {
   Capability,
   Event,
@@ -23,12 +23,13 @@ import TrackPlayer, {
   useTrackPlayerEvents,
 } from 'react-native-track-player';
 import Icon from '../assets/ICONS/notification.png';
+import NavigationButtons from '../components/NavigationButtons';
 const {width, height} = Dimensions.get('window');
 
 const skipTo = async id => {
   await TrackPlayer.skip(id);
 };
-export default function MusicPlayer() {
+export default function MusicPlayer({navigation}) {
   const playbackState = usePlaybackState();
   const progress = useProgress();
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -45,7 +46,7 @@ export default function MusicPlayer() {
         stopWithApp: true,
         backwardJumpInterval: 15,
         forwardJumpInterval: 15,
-
+        alwaysPauseOnInterruption: true,
         icon: Icon,
         capabilities: [
           Capability.Play,
@@ -285,26 +286,8 @@ export default function MusicPlayer() {
           </View>
         </View>
       </View>
-      <View style={styles.bottomContainer}>
-        <View style={styles.bottomControls}>
-          <TouchableOpacity onPress={() => {}}>
-            <Ionicons name="heart-outline" color="#777777" size={30} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={changeRepeatMode}>
-            <MaterialCommunityIcons
-              name={`${repeatIcon()}`}
-              color={repeatMode !== 'off' ? '#FFD369' : '#777777'}
-              size={30}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}}>
-            <Ionicons name="share-outline" color="#777777" size={30} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}}>
-            <Ionicons name="ellipsis-horizontal" color="#777777" size={30} />
-          </TouchableOpacity>
-        </View>
-      </View>
+
+      <NavigationButtons play={true} navigation={navigation} />
     </SafeAreaView>
   );
 }

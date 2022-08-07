@@ -22,7 +22,7 @@ import TrackPlayer, {
   useProgress,
   useTrackPlayerEvents,
 } from 'react-native-track-player';
-import Icon from '../assets/ICONS/notification.png';
+import Icon from '../assets/ICONS/notification0.png';
 import NavigationButtons from '../components/NavigationButtons';
 const {width, height} = Dimensions.get('window');
 
